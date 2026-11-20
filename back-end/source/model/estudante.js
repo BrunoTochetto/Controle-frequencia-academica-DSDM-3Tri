@@ -14,7 +14,7 @@ class Estudante {
       }
 
       registrarPresenca(presencas = 1) {
-            this.presenca += presencas
+            this.presenca += presencas;
       }
 }
 

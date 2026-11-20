@@ -15,15 +15,21 @@ class BancoDeDadosVolatil {
             }
       }
 
-      criarTurma(identificador, alunos) {
-            turma = Turma(identificador, alunos)
-            this.inserir("turma", turma)
+      criarTurma(identificador, alunos = null) {
+            turma = Turma(identificador, alunos);
+            this.inserir("turma", turma);
       }
 
       buscarTurma(identificador) {
-            this.#bd
+            let turmaAchada;
+            this.#bd["turma"].forEach(turma => {
+                  if (turma.identificador == identificador) {
+                        turmaAchada == turma;
+                        return
+                  }
+            });
 
-            return turma
+            return turmaAchada;
       }
 
       #criarTabela(tabela) {
