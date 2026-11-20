@@ -1,15 +1,25 @@
-const express = require("express");
-const cors = require("cors");
-const pkg = require("pg");
-const dotenv = require("dotenv");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const readline = require("readline");
-const { execSync } = require("child_process");
+import express, { json } from "express";
+import cors from "cors";
+import pkg from "pg";
+import { config } from "dotenv";
 
-dotenv.config();
+import jwt from "jsonwebtoken";
+
+// Cadastrar turmas, estudantes e registrar presenças.
+
+config();
 
 const app = express();
-app.use(express.json());
+app.use(json());
 app.use(cors());
+
+
+
+
+
+app.get("/api/status", (req, res) => {
+  res.json({ message: "Status Ativo" });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
