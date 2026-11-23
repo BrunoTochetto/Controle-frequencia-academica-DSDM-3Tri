@@ -1,12 +1,11 @@
-
-
 class Estudante {
       constructor(nome, id, idade, turma) {
             this.nome = nome;
-            this.#id = id;
+            this.id = id;
             this.idade = idade;
             this.turma = turma;
             this.presenca = 0;
+            this.faltas = 0;
       }
 
       mudarTurma(ObjetoTurmaNova) {
@@ -15,6 +14,23 @@ class Estudante {
 
       registrarPresenca(presencas = 1) {
             this.presenca += presencas;
+      }
+
+      registrarFalta(faltas = 1) {
+            this.faltas += faltas;
+      }
+
+      toJSON() {
+            return {
+                  id: this.id,
+                  nome: this.nome,
+                  idade: this.idade,
+                  turma: typeof this.turma === 'object'
+                        ? this.turma.identificador
+                        : this.turma,
+                  presenca: this.presenca,
+                  faltas: this.faltas,
+            };
       }
 }
 

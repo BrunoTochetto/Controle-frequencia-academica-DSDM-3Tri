@@ -1,47 +1,49 @@
-
 class Turma {
-      constructor(identificador, alunos = null) {
-            this.identificador = identificador;
+      constructor(identificador, alunos = []) {
+          this.identificador = identificador;
 
-            if (typeof(alunos) == Array) {
-                  this.alunos = alunos // Pede array alunos
-            } else if (typeof(alunos) == null) {
-                  this.alunos = [];
-            } else {
-                  this.alunos = [alunos];
-            }
-            
-            this.quantidadeAlunos = this.alunos.length;
+          if (Array.isArray(alunos)) {
+            this.alunos = alunos;
+          } else if (alunos == null) {
+            this.alunos = [];
+          } else {
+            this.alunos = [alunos];
+          }
+
+          this.quantidadeAlunos = this.alunos.length;
       }
 
       registrarAluno(aluno) {
-            this.alunos += aluno;
-            this.quantidadeAlunos = this.alunos.length;
+          this.alunos.push(aluno);
+          this.quantidadeAlunos = this.alunos.length;
       }
-      
+
       removerAluno(aluno) {
-            let pos = this.alunos.find(aluno);
-            if (!pos) {
-                  return "Não foi encontrado o aluno na turma"
-            }
-            this.alunos.splice(pos, 1);
-            this.quantidadeAlunos = this.alunos.length;
+          const posicao = this.alunos.findIndex((item) => item.id === aluno.id);
+
+          if (posicao === -1) {
+            return false;
+          }
+
+          this.alunos.splice(posicao, 1);
+          this.quantidadeAlunos = this.alunos.length;
+          return true;
       }
 
-      buscarAlunos(nome = False) {
-            if (nome) {
-                  let alunoAchado;
-                  this.alunos.forEach(aluno => {
-                        if (aluno.nome == nome) {
-                              alunoAchado == aluno;
-                              return
-                        }
-                  });
+      buscarAlunos(nome) {
+          if (!nome) return this.alunos;
 
-                  return turmaAchada;
-            } else {
-                  return this.alunos;
-            }
+          return this.alunos.filter((aluno) =>
+            aluno.nome.toLowerCase().includes(nome.toLowerCase()),
+          );
+      }
+
+      toJSON() {
+          return {
+            identificador: this.identificador,
+            alunos: this.alunos.map((aluno) => aluno.toJSON?.() ?? aluno),
+            quantidadeAlunos: this.quantidadeAlunos,
+          };
       }
 }
 
