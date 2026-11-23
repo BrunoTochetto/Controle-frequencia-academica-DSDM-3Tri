@@ -58,8 +58,8 @@ class _BuscaTurmasState extends State<BuscaTurmas> {
                 buscaController: _buscaController,
                 itemBuilder: (context, turma) => TurmaCard(
                   turma: turma,
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => RegistroPresenca(
@@ -68,6 +68,7 @@ class _BuscaTurmasState extends State<BuscaTurmas> {
                         ),
                       ),
                     );
+                    await _listaKey.currentState?.novaBusca();
                   },
                 ),
               ),

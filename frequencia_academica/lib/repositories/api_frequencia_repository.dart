@@ -110,4 +110,16 @@ class ApiFrequenciaRepository {
     final resultados = dados['dados'] as List<dynamic>? ?? const [];
     return resultados.map((item) => Turma.fromJson(item as Map<String, dynamic>)).toList();
   }
+
+  Future<Turma> buscarTurma(String identificador) async {
+    final caminho = Uri.encodeComponent(identificador);
+    final uri = Uri.parse('${ApiConfig.baseUrl}/turmas/$caminho');
+
+    final resposta = await cliente.get(uri);
+    if (resposta.statusCode != 200) {
+      throw Exception('Não foi possível carregar a turma.');
+    }
+
+    return Turma.fromJson(jsonDecode(resposta.body) as Map<String, dynamic>);
+  }
 }

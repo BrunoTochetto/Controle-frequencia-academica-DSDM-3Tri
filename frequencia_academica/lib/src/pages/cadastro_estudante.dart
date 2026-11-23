@@ -19,6 +19,13 @@ class _CadastroEstudanteState extends State<CadastroEstudante> {
   final _idadeController = TextEditingController();
   Turma? _turmaSelecionada;
   bool _salvando = false;
+  late final Future<List<Turma>> _turmasFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _turmasFuture = widget.repositorio.listarTurmas();
+  }
 
   @override
   void dispose() {
@@ -115,7 +122,7 @@ class _CadastroEstudanteState extends State<CadastroEstudante> {
               ),
               const SizedBox(height: 16),
               FutureBuilder<List<Turma>>(
-                future: widget.repositorio.listarTurmas(),
+                future: _turmasFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

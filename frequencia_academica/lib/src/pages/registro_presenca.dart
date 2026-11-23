@@ -18,9 +18,18 @@ class RegistroPresenca extends StatefulWidget {
 }
 
 class _RegistroPresencaState extends State<RegistroPresenca> {
+  late Turma _turma;
   final Set<int> _faltosos = {};
   final ScrollController _scrollController = ScrollController();
   bool _salvando = false;
+  bool _carregando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _turma = widget.turma;
+    _atualizarTurma();
+  }
 
   @override
   void dispose() {
@@ -28,10 +37,32 @@ class _RegistroPresencaState extends State<RegistroPresenca> {
     super.dispose();
   }
 
+  Future<void> _atualizarTurma() async {
+    setState(() => _carregando = true);
+
+    try {
+      final turmaAtualizada = await widget.repositorio.buscarTurma(
+        widget.turma.identificador,
+      );
+      if (!mounted) return;
+      setState(() {
+        _turma = turmaAtualizada;
+      });
+    } catch (erro) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
+  }
+
   Future<void> _salvar() async {
     setState(() => _salvando = true);
 
     try {
+      final quantidadeFaltosos = _faltosos.length;
       await widget.repositorio.registrarFaltas(
         widget.turma.identificador,
         _faltosos.toList(),
@@ -39,8 +70,10 @@ class _RegistroPresencaState extends State<RegistroPresenca> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_faltosos.length} faltas registradas')),
+        SnackBar(content: Text('$quantidadeFaltosos faltas registradas')),
       );
+      _faltosos.clear();
+      await _atualizarTurma();
     } catch (erro) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -78,7 +111,7 @@ class _RegistroPresencaState extends State<RegistroPresenca> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${widget.turma.quantidadeAlunos} estudantes',
+                  '${_turma.quantidadeAlunos} estudantes',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
@@ -89,39 +122,41 @@ class _RegistroPresencaState extends State<RegistroPresenca> {
             ),
           ),
           Expanded(
-            child: widget.turma.alunos.isEmpty
-                ? const Center(child: Text('Esta turma não possui estudantes.'))
-                : Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      cacheExtent: 600,
-                      itemCount: widget.turma.alunos.length,
-                      itemBuilder: (context, index) {
-                        final estudante = widget.turma.alunos[index];
-                        final faltoso = _faltosos.contains(estudante.id);
+            child: _carregando
+                ? const Center(child: CircularProgressIndicator())
+                : _turma.alunos.isEmpty
+                    ? const Center(child: Text('Esta turma não possui estudantes.'))
+                    : Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          cacheExtent: 600,
+                          itemCount: _turma.alunos.length,
+                          itemBuilder: (context, index) {
+                            final estudante = _turma.alunos[index];
+                            final faltoso = _faltosos.contains(estudante.id);
 
-                        return CheckboxListTile(
-                          value: faltoso,
-                          title: Text(estudante.nome),
-                          subtitle: Text(
-                            'ID: ${estudante.id} • ${estudante.faltas} faltas • ${estudante.presenca} presenças',
-                          ),
-                          secondary: const CircleAvatar(child: Icon(Icons.person)),
-                          onChanged: (valor) {
-                            setState(() {
-                              if (valor == true) {
-                                _faltosos.add(estudante.id);
-                              } else {
-                                _faltosos.remove(estudante.id);
-                              }
-                            });
+                            return CheckboxListTile(
+                              value: faltoso,
+                              title: Text(estudante.nome),
+                              subtitle: Text(
+                                'ID: ${estudante.id} • ${estudante.faltas} faltas • ${estudante.presenca} presenças',
+                              ),
+                              secondary: const CircleAvatar(child: Icon(Icons.person)),
+                              onChanged: (valor) {
+                                setState(() {
+                                  if (valor == true) {
+                                    _faltosos.add(estudante.id);
+                                  } else {
+                                    _faltosos.remove(estudante.id);
+                                  }
+                                });
+                              },
+                            );
                           },
-                        );
-                      },
-                    ),
-                  ),
+                        ),
+                      ),
           ),
         ],
       ),

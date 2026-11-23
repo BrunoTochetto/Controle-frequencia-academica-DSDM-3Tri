@@ -29,4 +29,13 @@ class Turma {
       'quantidadeAlunos': quantidadeAlunos,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is Turma && identificador == other.identificador;
+  }
+
+  @override
+  int get hashCode => identificador.hashCode;
 }

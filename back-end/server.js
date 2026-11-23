@@ -15,11 +15,11 @@ app.use(cors());
 const banco = new BancoDeDadosVolatil();
 
 
-// banco.criarTurma("DSDM");
-// banco.criarTurma("DW 3");
-// banco.criarEstudante("Bruno", 1, 16, "DSDM");
-// banco.criarEstudante("Bruna", 2, 17, "DSDM");
-// banco.criarEstudante("João", 3, 16, "DW 3");
+banco.criarTurma("DSDM");
+banco.criarTurma("DW 3");
+banco.criarEstudante("Bruno", 1, 16, "DSDM");
+banco.criarEstudante("Bruna", 2, 17, "DSDM");
+banco.criarEstudante("João", 3, 16, "DW 3");
 
 app.get("/api/status", (req, res) => {
   res.json({ message: "Status Ativo" });
